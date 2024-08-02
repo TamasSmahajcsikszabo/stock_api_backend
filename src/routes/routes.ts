@@ -24,8 +24,7 @@ stockRouter.get("/stock/:symbol", (req, res) => {
     console.log("Running in DEV mode!");
     res.send(processStockData(useMockData()));
   } else {
-    const stockData = getDailyStockData(symbol, "compact");
-    stockData
+    getDailyStockData(symbol, "compact")
       .then((data: any) => res.send(processStockData(data)))
       .catch((error: any) => {
         console.log(`Error occured: ${error}`);
@@ -42,10 +41,10 @@ stockRouter.get("/stock/:symbol", (req, res) => {
   }
 });
 
+//TODO stop scheduler?
 stockRouter.put("/stock/:symbol", (req, res) => {
   cron.schedule("* 1 * * *", () => {
-    const stockData = getDailyStockData(req.params.symbol, "compact");
-    stockData
+    getDailyStockData(req.params.symbol, "compact")
       .then((data: any) => res.send(processStockData(data)))
       .catch((error: any) => console.log(error));
   });
