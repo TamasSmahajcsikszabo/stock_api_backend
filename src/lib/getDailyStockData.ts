@@ -1,6 +1,6 @@
-import { getDailyTrendURL } from "../stockAPI/getDailyTrendURL.js";
-import { StockData } from "../types/DailyPrice.js";
 import axios from "axios";
+import { getDailyTrendURL } from "../api/getDailyTrendURL.js";
+import { StockData } from "../types/DailyPrice.js";
 
 export async function getDailyStockData(symbol: string, outputsize: string) {
   const getDailyTockUrl = getDailyTrendURL(symbol, outputsize);
