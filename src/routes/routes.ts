@@ -1,28 +1,42 @@
 import express from "express";
 import { getDailyStockData } from "../api/getDailyStockData.js";
-import { StockData } from "../types/DailyPrice.js";
-const stockRouter = express.Router();
-const dataLabel: string = "Time Series (Daily)";
+import dotenv from "dotenv";
+import { useMockData } from "../api/mockData.js";
+import { transformStockData } from "../api/transformStockData.js";
+import { computeMovingAverage } from "../stockAPI/computeMovingAverage.js";
+import { StockDataPoint } from "../types/DailyPrice.js";
+import { StockEntries } from "../types/DailyPrice.js";
 
-stockRouter.get("/stock/raw/:symbol", (req, res) => {
-  const stockData = getDailyStockData(req.params.symbol, "compact");
-  stockData
-    .then((data) => res.send((data as any)[dataLabel] as StockData[]))
-    .catch((error) => console.log(error));
+const config = dotenv.config();
+const isDevMode = config?.parsed?.MODE === 'dev';
+const stockRouter = express.Router();
+
+stockRouter.get('/', (_, res) => {
+    res.send('Welcome to the Stock API');
 });
 
 stockRouter.get("/stock/:symbol", (req, res) => {
-  const stockData = getDailyStockData(req.params.symbol, "compact");
-  stockData
-    .then((data) => {
-      try {
-        // const stockValues = Object.values((data as any)[dataLabel]) as StockData[];
-        res.send(data);
-      } catch (error) {
-        console.log(error);
-      }
-    })
-    .catch((error) => console.log(error));
+    if (isDevMode) {
+        res.send(processStockData(useMockData()));
+  } else {
+      const stockData = getDailyStockData(req.params.symbol, "compact");
+      stockData.then((data: any) => res.send(processStockData(data))).catch((error: any) => console.log(error));
+  }
 });
+
+// Process incoming stock data, compute average and return desired format
+function processStockData(stockData: any) {
+      const data = transformStockData(stockData);
+      let report = {} as StockDataPoint;
+
+      StockEntries.forEach((e) => {
+          let current: number[] = [];
+          (data[1] as StockDataPoint[]).map((entry: StockDataPoint) => current.push((entry as any)[e]));
+          const average = computeMovingAverage(current, 10)[0];
+          report[e] = average;
+      })
+      return {'current values': (data[1] as StockDataPoint[])[0],'last updated': Object.values(data[0])[2], '10 days moving averages:': report};
+}
+
 
 export { stockRouter };
