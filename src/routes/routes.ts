@@ -1,14 +1,14 @@
-import express from "express";
-import { getDailyStockData } from "../api/getDailyStockData.js";
+import cron from "node-cron";
 import dotenv from "dotenv";
-import { useMockData } from "../api/mockData.js";
-import { transformStockData } from "../api/transformStockData.js";
-import { computeMovingAverage } from "../stockAPI/computeMovingAverage.js";
-import { getCurrentTime } from "../api/getCurrentTime.js";
+import express from "express";
+import { checkSymbol } from "../lib/checkSymbol.js";
+import { computeMovingAverage } from "../api/computeMovingAverage.js";
+import { getCurrentTime } from "../lib/getCurrentTime.js";
+import { getDailyStockData } from "../lib/getDailyStockData.js";
+import { transformStockData } from "../lib/transformStockData.js";
+import { useMockData } from "../lib/mockData.js";
 import { StockDataPoint } from "../types/DailyPrice.js";
 import { StockEntries } from "../types/DailyPrice.js";
-import cron from "node-cron";
-import { checkSymbol } from "../api/checkSymbol.js";
 
 const config = dotenv.config();
 const isDevMode = config?.parsed?.MODE === "dev";
