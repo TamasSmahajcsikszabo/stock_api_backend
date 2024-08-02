@@ -1,5 +1,11 @@
-export const StockEntries = ["1. open", "2. high", "3. low", "4. close", "5. volume"] as const;
-type StockEntry = typeof StockEntries[number];
+export const StockEntries = [
+  "1. open",
+  "2. high",
+  "3. low",
+  "4. close",
+  "5. volume",
+] as const;
+type StockEntry = (typeof StockEntries)[number];
 
 type StockDataEntry = {
   [label in StockEntry]: string;
@@ -26,8 +32,8 @@ type MetaData = {
 export const MetaDataLabel = "Meta Data";
 export const TimeSeriesLabel = "Time Series (Daily)";
 export interface VantageData {
-  [MetaDataLabel] : MetaData,
-  [TimeSeriesLabel]: StockData
+  [MetaDataLabel]: MetaData;
+  [TimeSeriesLabel]: StockData;
 }
 
 export interface StockDataPoint {

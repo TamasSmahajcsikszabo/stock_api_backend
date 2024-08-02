@@ -1,6 +1,6 @@
 /*
  * Computes moving average on an array of values
-*/
+ */
 export function computeMovingAverage(
   data: (number | string)[],
   window: number,
