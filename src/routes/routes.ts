@@ -2,7 +2,7 @@ import cron from "node-cron";
 import dotenv from "dotenv";
 import express from "express";
 import { checkSymbol } from "../lib/checkSymbol.js";
-import { computeMovingAverage } from "../api/computeMovingAverage.js";
+import { computeMovingAverage } from "../lib/computeMovingAverage.js";
 import { getCurrentTime } from "../lib/getCurrentTime.js";
 import { getDailyStockData } from "../lib/getDailyStockData.js";
 import { transformStockData } from "../lib/transformStockData.js";
