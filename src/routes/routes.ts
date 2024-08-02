@@ -7,7 +7,7 @@ import { computeMovingAverage } from "../stockAPI/computeMovingAverage.js";
 import { getCurrentTime } from "../api/getCurrentTime.js";
 import { StockDataPoint } from "../types/DailyPrice.js";
 import { StockEntries } from "../types/DailyPrice.js";
-import cron from 'node-cron';
+import cron from "node-cron";
 
 const config = dotenv.config();
 const isDevMode = config?.parsed?.MODE === "dev";
@@ -28,14 +28,14 @@ stockRouter.get("/stock/:symbol", (req, res) => {
   }
 });
 
-stockRouter.put('/stock/:symbol', (req, res) => {
-    cron.schedule('* 1 * * *', () =>{
-        const stockData = getDailyStockData(req.params.symbol, "compact");
-        stockData
-          .then((data: any) => res.send(processStockData(data)))
-          .catch((error: any) => console.log(error));
-    })
-})
+stockRouter.put("/stock/:symbol", (req, res) => {
+  cron.schedule("* 1 * * *", () => {
+    const stockData = getDailyStockData(req.params.symbol, "compact");
+    stockData
+      .then((data: any) => res.send(processStockData(data)))
+      .catch((error: any) => console.log(error));
+  });
+});
 
 // Process incoming stock data, compute average and return desired format
 function processStockData(stockData: any) {
