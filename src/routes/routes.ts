@@ -4,8 +4,10 @@ import dotenv from "dotenv";
 import { useMockData } from "../api/mockData.js";
 import { transformStockData } from "../api/transformStockData.js";
 import { computeMovingAverage } from "../stockAPI/computeMovingAverage.js";
+import { getCurrentTime } from "../api/getCurrentTime.js";
 import { StockDataPoint } from "../types/DailyPrice.js";
 import { StockEntries } from "../types/DailyPrice.js";
+import cron from 'node-cron';
 
 const config = dotenv.config();
 const isDevMode = config?.parsed?.MODE === "dev";
@@ -26,6 +28,15 @@ stockRouter.get("/stock/:symbol", (req, res) => {
   }
 });
 
+stockRouter.put('/stock/:symbol', (req, res) => {
+    cron.schedule('* 1 * * *', () =>{
+        const stockData = getDailyStockData(req.params.symbol, "compact");
+        stockData
+          .then((data: any) => res.send(processStockData(data)))
+          .catch((error: any) => console.log(error));
+    })
+})
+
 // Process incoming stock data, compute average and return desired format
 function processStockData(stockData: any) {
   const data = transformStockData(stockData);
@@ -41,7 +52,7 @@ function processStockData(stockData: any) {
   });
   return {
     "current values": (data[1] as StockDataPoint[])[0],
-    "last updated": Object.values(data[0])[2],
+    "last updated": getCurrentTime(),
     "10 days moving averages:": report,
   };
 }
