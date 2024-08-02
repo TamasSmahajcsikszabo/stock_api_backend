@@ -8,6 +8,7 @@ import { getCurrentTime } from "../api/getCurrentTime.js";
 import { StockDataPoint } from "../types/DailyPrice.js";
 import { StockEntries } from "../types/DailyPrice.js";
 import cron from "node-cron";
+import { checkSymbol } from "../api/checkSymbol.js";
 
 const config = dotenv.config();
 const isDevMode = config?.parsed?.MODE === "dev";
@@ -18,13 +19,26 @@ stockRouter.get("/", (_, res) => {
 });
 
 stockRouter.get("/stock/:symbol", (req, res) => {
+  const symbol: string = req.params.symbol;
   if (isDevMode) {
+    console.log("Running in DEV mode!");
     res.send(processStockData(useMockData()));
   } else {
-    const stockData = getDailyStockData(req.params.symbol, "compact");
+    const stockData = getDailyStockData(symbol, "compact");
     stockData
       .then((data: any) => res.send(processStockData(data)))
-      .catch((error: any) => console.log(error));
+      .catch((error: any) => {
+        console.log(`Error occured: ${error}`);
+        try {
+          console.log("Running symbol validity check...");
+          const checkSymbolResult = checkSymbol(symbol);
+          checkSymbolResult
+            .then((result) => res.send(result))
+            .catch((error) => console.log(error));
+        } catch (error) {
+          console.log(error);
+        }
+      });
   }
 });
 
@@ -53,7 +67,7 @@ function processStockData(stockData: any) {
   return {
     "current values": (data[1] as StockDataPoint[])[0],
     "last updated": getCurrentTime(),
-    "10 days moving averages:": report,
+    "10 days moving averages": report,
   };
 }
 
