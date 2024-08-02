@@ -1,3 +1,6 @@
+/*
+ * Computes moving average on an array of values
+*/
 export function computeMovingAverage(
   data: (number | string)[],
   window: number,
@@ -9,7 +12,7 @@ export function computeMovingAverage(
 
   let movingAverages: number[] = [];
 
-  data.forEach((value: number | string, i: number) => {
+  data.forEach((_: number | string, i: number) => {
     let subArray: number[] = data
       .slice(i, bin + i)
       .filter((value: string | number) => value !== undefined && value !== null)
